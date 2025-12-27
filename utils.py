@@ -8,7 +8,7 @@ used across the project to avoid code duplication.
 import time
 
 
-def print_output(System_prompt, User_prompt, output):
+def print_output(System_prompt:str, User_prompt:str, output:any)->None:
     """
     Formats and prints prompt-output pairs
     for better readability.
