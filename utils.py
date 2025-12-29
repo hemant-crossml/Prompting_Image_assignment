@@ -8,14 +8,14 @@ used across the project to avoid code duplication.
 import time
 
 
-def print_output(System_prompt:str, User_prompt:str, output:any)->None:
+def print_output(system_prompt:str, user_prompt:str, output:any):
     """
     Formats and prints prompt-output pairs
     for better readability.
     """
     print("\n" + "-" * 60)
     print("PROMPT:")
-    print(System_prompt,"\n",User_prompt)
+    print(system_prompt,"\n",user_prompt)
     print("\nOUTPUT:")
     print(output)
     print("-" * 60)

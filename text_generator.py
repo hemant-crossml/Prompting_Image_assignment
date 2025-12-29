@@ -5,9 +5,8 @@ from google.genai import types
 
 from utils import print_output, retry_delay
 
-ImageType=Union[Image.Image, types.Part]
 
-def generate_text(client, model_name: str, System_prompt: str,User_prompt: str,Image: Optional[ImageType], config: Optional[dict] = None,)-> Optional[str]:
+def generate_text(client, model_name: str, system_prompt: str,user_prompt: str,image: Optional[Union[Image.Image, types.Part]], config: Optional[dict] = None,):
    
     """
 Summary:
@@ -25,19 +24,19 @@ Args:
     config (Optional[dict]): Generation configuration (temperature, top_p, max_tokens, etc.).
 
 Return:
-    Optional[str]: Returns None; generated text is printed via print_output utility. 
-                   Raises exceptions are caught and handled with retry_delay mechanism.
+     Returns None; generated text is printed via print_output utility. 
+     Raises exceptions are caught and handled with retry_delay mechanism.
 """
 
     try:
         # Send the user prompt to the Gemini model for text generation
         response = client.models.generate_content(
             model=model_name,  
-            contents=[Image,User_prompt],
+            contents=[image,user_prompt],
             config=config
         )
         # Print formatted output including prompts and model response
-        print_output(System_prompt,User_prompt, response.text)
+        print_output(system_prompt,user_prompt, response.text)
 
     except Exception as e:
         # Handle runtime or API-related errors gracefully

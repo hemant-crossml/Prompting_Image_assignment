@@ -9,9 +9,9 @@ This module orchestrates the overall flow by:
 - Triggering the text generation process
 """
 
-from client import Client
+from client import client
 from config import CONFIG, MODEL_NAME
-from prompts import System_Prompt, User_Prompt, form_image
+from prompts import system_prompt, user_prompt, form_image
 from text_generator import generate_text
 
 def main():
@@ -35,7 +35,7 @@ def main():
         None: This script executes the text generation workflow via generate_text() but 
             does not return any explicit values. Output is handled internally by the generator.
     """
-    generate_text(Client, MODEL_NAME, System_Prompt, User_Prompt, form_image, CONFIG)
+    generate_text(client, MODEL_NAME, system_prompt, user_prompt, form_image, CONFIG)
 
 
 # Ensures the main function runs only when this file
