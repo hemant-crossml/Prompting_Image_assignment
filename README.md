@@ -1,4 +1,4 @@
-# Prompting_assignment
+# Prompting_Image_assignment
 implementing all types of prompting techniques for extracting data from image.
 ## Project Overview
 The project consists of ** different prompt experiments **:
