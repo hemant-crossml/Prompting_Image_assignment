@@ -23,17 +23,11 @@ def main():
         through a protected main function that runs only when the script is directly executed.
 
     Args:
-        None: The main() function imports and uses pre-configured components from other modules:
-            - Client: Initialized client instance from client module
-            - MODEL_NAME (str): Gemini model name from config module
-            - System_Prompt (str): System instruction prompt from prompts module
-            - User_Prompt (str): User input prompt from prompts module
-            - form_image: Image formatting utility from prompts module
-            - CONFIG: Generation configuration from config module
+        None: this function has no argument
+
 
     Return:
-        None: This script executes the text generation workflow via generate_text() but 
-            does not return any explicit values. Output is handled internally by the generator.
+        None: this  return none
     """
     generate_text(client, MODEL_NAME, system_prompt, user_prompt, form_image, CONFIG)
 

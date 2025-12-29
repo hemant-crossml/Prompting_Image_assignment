@@ -6,7 +6,7 @@ from google.genai import types
 from utils import print_output, retry_delay
 
 
-def generate_text(client, model_name: str, system_prompt: str,user_prompt: str,image: Optional[Union[Image.Image, types.Part]], config: Optional[dict] = None,):
+def generate_text(client, model_name: str, system_prompt: str,user_prompt: str,image: Optional[Union[Image.Image, types.Part]], config: Optional[dict] = None):
    
     """
 Summary:
@@ -18,9 +18,9 @@ Summary:
 Args:
     client: Initialized Google Generative AI client instance for API communication.
     model_name (str): Name of the Gemini model (e.g., "gemini-2.5-flash") to use for generation.
-    System_prompt (str): System instruction defining AI role, guidelines, and output format.
-    User_prompt (str): User query or instruction to process with the model.
-    Image (Optional[ImageType]): PIL Image or Google GenAI Part for multimodal analysis (tax form).
+    system_prompt (str): System instruction defining AI role, guidelines, and output format.
+    user_prompt (str): User query or instruction to process with the model.
+    image (Optional[Union[Image.Image, types.Part]]): PIL Image or Google GenAI Part for multimodal analysis (tax form).
     config (Optional[dict]): Generation configuration (temperature, top_p, max_tokens, etc.).
 
 Return:
