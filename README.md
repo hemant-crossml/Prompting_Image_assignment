@@ -16,13 +16,13 @@ The project consists of ** different prompt experiments **:
 ##  Tech Stack
 - **Language:** Python 3.10+
 - **LLM:** Google Gemini
-- **SDK:** `google-genai`
+- **SDK:** `google-genai`, PILLOW
 - **Environment Management:** `python-dotenv`
 ---
 ##  Installation
 1. Clone the repository
     ```bash
-        git clone https://github.com/hemant-crossml/Prompting_assignment.git
+        git clone https://github.com/hemant-crossml/Prompting_Image_assignment.git
         cd Prompting_assignment
 2. Create and activate a virtual environment (recommended)
     ```bash
@@ -30,7 +30,7 @@ The project consists of ** different prompt experiments **:
         source venv/bin/activate
 3. Install dependencies
     ```bash
-        pip install google-genai python-dotenv
+        pip install google-genai python-dotenv pillow
 4.  Set up your GEMINI_API_KEY:
     
     Create a file named .env in the root directory of this project. Add the following line to the .env file, replacing YOUR_API_KEY with your actual Gemini API key:
