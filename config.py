@@ -1,3 +1,12 @@
+"""
+gemini_config.py
+
+Defines the Gemini model name and default generation configuration used across
+the project.
+
+This module centralizes Gemini API settings such as system instructions and
+sampling parameters (temperature, top_p, top_k) to keep inference consistent.
+"""
 from google.genai import types
 
 from prompts import system_prompt
