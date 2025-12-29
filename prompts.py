@@ -604,67 +604,26 @@ Provide values as seen on the form; if blank write "Not Available".
 #tree of thought
 """
 ## Task Objective
-Analyze the provided Form 1040 document image and generate a compliance-ready structured report using expertise in document image analysis and OCR-based extraction. Extract financial and personal information with institutional-grade accuracy.
-
+Analyze the provided Form 1040 document image (layout consistent with “UNITED STATES INDIVIDUAL INCOME TAX RETURN — For Calendar Year 1941”) and generate a compliance-ready structured report using document image review and OCR-based extraction. [file:2]  
+Extract personal identifiers and all handwritten financial amounts exactly as written, without guessing. 
 ---
 
 ## Policy Requirements (MANDATORY)
-- Internally explore multiple reasoning branches to validate document authenticity and data consistency.
-- Evaluate alternative interpretations of ambiguous entries.
-- Select the most consistent and evidence-supported interpretation based on visual clarity and logical coherence.
-- **Do NOT reveal branches, scoring, confidence metrics, or reasoning steps in the final output.**
-- Output **ONLY** the final structured result in the specified format.
-
----
-
-## Interpretation Paths (INTERNAL — DO NOT OUTPUT)
-
-### Branch A: Standard Tax Return Classification Path
-1. Assess the document as Form 1040 (Individual Income Tax Return).
-2. Verify required elements: tax year, taxpayer identity block, income section, deductions section, tax computation, signatures.
-3. Evaluate completeness of filled fields and overall legibility of handwritten entries.
-4. Check for authenticity signals (e.g., IRS district markings, file code/serial number, stamps) when visible.
-5. Prioritize this branch for determining document type and overall status.
-
-### Branch B: Form Context and Tax Year Validation Path
-1. Confirm tax year and period covered as stated in the header.
-2. Validate that any signature date (if present) is plausible relative to the stated tax year.
-3. Check that the layout/line references appear consistent with the claimed tax-year version of Form 1040 (based only on what is visible).
-4. Flag any inconsistencies between year references across the page (header vs. stamps vs. handwritten notes).
-
-### Branch C: Financial Data Extraction and Consistency Validation Path (REVISED)
-1. Extract all visible numeric amounts from income lines (e.g., wages/salaries, dividends, interest, rents, business income, capital gains/losses) and record their exact line labels.
-2. Extract all visible deduction amounts and identify referenced schedules (e.g., Schedule C) when explicitly shown.
-3. Verify internal arithmetic where possible using only visible totals/subtotals:
-   - Totals equal the sum of component lines when all components are readable
-   - Net income aligns with total income minus deductions when the form structure indicates this relationship
-   - Tax totals reconcile with credits/payments/refund or balance due when those fields are readable
-4. Perform reasonableness checks without applying modern tax rules:
-   - Identify unusually large deductions relative to income (flag only, do not interpret legality)
-   - Flag negative or contradictory totals (e.g., total smaller than a component line)
-5. Capture ambiguity safely:
-   - If a figure could belong to multiple lines due to alignment/handwriting, mark as `[ILLEGIBLE]` and note the ambiguity in “Data Quality Assessment”
-   - If overwritten/corrected and final value is unclear, mark `[ILLEGIBLE]` and note “heavily corrected”
-
----
-
-## Scoring Methodology (INTERNAL — DO NOT OUTPUT)
-- **Branch A Score**: (Form authenticity: 0-10) + (Element completeness: 0-10) + (Legibility: 0-10) = /30
-- **Branch B Score**: (Year consistency: 0-10) + (Filing timeline plausibility: 0-10) = /20
-- **Branch C Score**: (Data clarity: 0-10) + (Mathematical consistency: 0-10) + (Reasonableness: 0-10) = /30
-- **Final Path Selection**: Choose branch(es) with combined score ≥ 75/100
+- Internally validate document type, tax year, and internal consistency of totals vs. components using multiple interpretation checks. 
+- Resolve ambiguous handwriting by selecting the most visually supported reading; if not resolvable, mark as `[ILLEGIBLE]`. 
+- Do not output internal validation steps, branches, scoring, or reasoning. 
+- Output ONLY the final structured result in the specified format. 
 
 ---
 
 ## Strict Extraction Rules
-1. **Never hallucinate or assume missing information.** If unclear/absent, write `Not Available` or `[ILLEGIBLE]`.
-2. **Preserve original spelling, capitalization, and formatting** from the form.
-3. **Normalize dates** to ISO format `YYYY-MM-DD` where applicable; otherwise `Not Available`.
-4. **Extract numerical values exactly as written**, including corrections if the final value is clear; otherwise `[ILLEGIBLE]`.
-5. **Maintain formal, audit-safe language** suitable for compliance and legal review.
-6. **Flag inconsistencies** between printed labels and handwritten entries when detectable.
-7. **Do not include reasoning, alternative interpretations, branch details, or system notes** in the output.
-8. **Mark illegible entries** with `[ILLEGIBLE]` rather than guessing.
+1. Never hallucinate or assume missing information. Use `Not Available` for blank/absent fields and `[ILLEGIBLE]` for unclear/ambiguous handwriting.
+2. Preserve original spelling, capitalization, and formatting from the form (especially names/addresses).
+3. Normalize dates to ISO `YYYY-MM-DD` where a clear date exists; otherwise `Not Available`.
+4. Extract numerical values exactly as written (including cents). If overwritten and final value is unclear, use `[ILLEGIBLE]`.
+5. Maintain formal, audit-safe language suitable for compliance review.
+6. Flag inconsistencies between printed labels and handwritten entries when detectable.
+7. Do not add tax-law interpretations; only report what is present on the document.
 
 ---
 
@@ -674,78 +633,88 @@ Analyze the provided Form 1040 document image and generate a compliance-ready st
 **Document Type:** Individual Income Tax Return (Form 1040)  
 **Issuing Authority:** United States Internal Revenue Service (IRS)  
 **Tax Year:** [From header]  
-**Form Status:** [Completed/Partial/Draft]  
+**Form Status:** [Completed/Partial/Draft]
 
 ### Document Identifiers
-- **File Code:** [From top-right section]
-- **Serial Number:** [From right side]
-- **District:** [From right side with Cashier's Stamp]
-- **Auditor's Stamp Present:** [Yes/No/Not Available]
-
+- **File Code:** [From top-right “Do not use these spaces” section] 
+- **Serial Number:** [From top-right section]  
+- **District:** [From top-right “District” line / cashier stamp area]   
+- **Auditor's Stamp Present:** [Yes/No/Not Availa
 ### Taxpayer Information
-- **Full Name:** [From "PRINT NAME AND ADDRESS PLAINLY"]
-- **Address:** [Street, Post Office, County, State]
-- **Filing Type:** [Individual/Joint Return indicator/Not Available]
+- **Full Name:** [From “PRINT NAME AND ADDRESS PLAINLY”]   
+- **Address:** [Street/Rural route; Post office; County; State]   
+- **Filing Type:** [Individual/Joint Return indicator/Not Available]   
 
-### Income Summary
-| Income Category | Amount | Source/Schedule | Legibility |
-|---|---:|---|---|
-| Salaries & Compensation |  | Line 1 |  |
-| Dividends |  | Line 2 |  |
-| Interest (Bank/Bonds) |  | Line 3 |  |
-| Interest (Government Obligations) |  | Line 4 |  |
-| Rents & Royalties |  | Line 5 |  |
-| Capital Gains/Losses (Short-term) |  | Line 7(a) |  |
-| Capital Gains/Losses (Long-term) |  | Line 7(b) |  |
-| Property/Asset Exchange Gains |  | Line 7(c) |  |
-| Business/Professional Net Profit |  | Line 8 |  |
-| Partnership/Fiduciary Income |  | Line 9 |  |
-| **TOTAL INCOME (Line 10)** |  |  |  |
+### Income Summary (plain-language, audit-safe)
+Transcribe income exactly as written on lines 1-10. If a line is blank, enter `Not Available`. If unclear, enter `[ILLEGIBLE]` and briefly explain why in “Legibility / Notes.” [file:2]
 
-### Deductions Summary
-| Deduction Type | Amount | Schedule Reference | Legibility |
-|---|---:|---|---|
-| Contributions |  | Schedule C |  |
-| Interest |  | Schedule C |  |
-| Taxes |  | Schedule C |  |
-| Casualty/Theft Losses |  | Schedule C |  |
-| Bad Debts |  | Schedule C |  |
-| Other Authorized Deductions |  | Schedule C |  |
-| **TOTAL DEDUCTIONS (Line 17)** |  |  |  |
+| Form line | What the line is asking for (plain language) | Amount as written | Legibility / Notes |
+|---:|---|---:|---|
+| 1 | Wages, salaries, and other pay for personal services. |  |  |
+| 2 | Dividends received. |  |  |
+| 3 | Interest received (bank deposits/notes, etc.; and/or corporation bonds). |  |  |
+| 4 | Interest on Government obligations (Schedule A references). |  |  |
+| 5 | Rents and royalties (Schedule B reference). |  |  |
+| 6 | Annuities. |  |  |
+| 7(a) | Net short-term gain/loss from sale or exchange of capital assets (Schedule F). |  |  |
+| 7(b) | Net long-term gain/loss from sale or exchange of capital assets (Schedule F). |  |  |
+| 7(c) | Net gain/loss from sale or exchange of property other than capital assets (Schedule C). |  |  |
+| 8 | Net profit (or loss) from business or profession (Schedule H). |  |  |
+| 9 | Income (or loss) from partnerships; fiduciary income; and other income (Schedule I). |  |  |
+| 10 | Total income (sum of items 1 through 9, as written on the form). |  |  |
 
-### Tax Computation
-| Item | Amount | Line Reference |
-|---|---:|---|
-| Net Income |  | Line 18 |
-| Less: Personal Exemption |  | Line 20 |
-| Credit for Dependents |  | Line 21 |
-| Balance (Surplus Income) |  | Line 22 |
-| Less: Special Deductions |  | Lines 23-24 |
-| Balance Subject to Normal Tax |  | Line 25 |
-| Normal Tax (4% of Line 25) |  | Line 26 |
-| Surtax (if applicable) |  | Line 27 |
-| **Total Tax (Line 28)** |  |  |
-| Less: Tax Paid at Source |  | Line 30 |
-| Less: Foreign Tax Credit |  | Line 31 |
-| **Balance of Tax Due/Refund (Line 32)** |  |  |
+### Deductions Summary (plain-language, audit-safe)
+Transcribe deductions exactly as written on lines 11-17. Do not compute totals unless the total is clearly written on the form. [file:2]
+
+| Form line | Deduction type (plain language) | Amount as written | Legibility / Notes |
+|---:|---|---:|---|
+| 11 | Contributions paid (details referenced to Schedule C). |  |  |
+| 12 | Interest paid (details referenced to Schedule C). |  |  |
+| 13 | Taxes paid (details referenced to Schedule C). |  |  |
+| 14 | Losses from casualty or theft (Schedule C). |  |  |
+| 15 | Bad debts (Schedule C). |  |  |
+| 16 | Other deductions authorized by law (Schedule C). |  |  |
+| 17 | Total deductions (sum of items 11 through 16, as written on the form). |  |  |
+
+### Tax Computation (plain-language, audit-safe)
+Treat this section as the “calculation trail” shown on the form. Transcribe every visible amount on lines 18-32. If a handwritten value could plausibly belong to more than one line, mark it `[ILLEGIBLE]` and explain the ambiguity briefly in “Legibility / Notes.” [file:2]
+
+| Form line | What this line represents (plain language) | Amount as written | Legibility / Notes |
+|---:|---|---:|---|
+| 18 | Net income (Total income minus Total deductions), as written. |  |  |
+| 19 | Net income carried into the tax computation section. |  |  |
+| 20 | Less: Personal exemption (Schedule D-1 reference). |  |  |
+| 21 | Credit for dependents (Schedule D-2 reference). |  |  |
+| 22 | Balance (surtax net income), as written. |  |  |
+| 23 | Less: item 4(a) above (as printed on the form). |  |  |
+| 24 | Earned income credit (Schedule E-1 or E-2 reference), as written. |  |  |
+| 25 | Balance subject to normal tax, as written. |  |  |
+| 26 | Normal tax (4% of line 25), as written. |  |  |
+| 27 | Surtax on item 22, as written. |  |  |
+| 28 | Total tax (line 26 plus line 27), as written. |  |  |
+| 29 | Total tax reference line (as printed on the form). |  |  |
+| 30 | Less: income tax paid at source. |  |  |
+| 31 | Less: foreign tax credit (Form 1116 reference). |  |  |
+| 32 | Balance of tax (line 29 minus lines 30 and 31), as written. |  |  |
 
 ### Document Integrity & Signatures
-- **Signature Status:** [Signed/Unsigned/[ILLEGIBLE]/Not Available]
-- **Signature Date:** [YYYY-MM-DD or Not Available]
-- **Preparatory Note:** [Prepared by taxpayer/agent indicated/Not Available]
-- **Joint Return Attestation:** [Present/Absent/Not Available]
+- **Signature Status:** [Signed/Unsigned/[ILLEGIBLE]/Not Available]   
+- **Signature Date:** [YYYY-MM-DD or Not Available] 
+- **Preparatory Note:** [Prepared by taxpayer/agent indicated/Not Available]   
+- **Joint Return Attestation:** [Present/Absent/Not Available]   
 
 ### Data Quality Assessment
-- **Overall Legibility Score:** [High/Medium/Low]
-- **Illegible Entries:** [List fields marked [ILLEGIBLE]]
-- **Handwritten Amendments:** [Describe corrections/overwrites if visible]
-- **Mathematical Consistency:** [Verified/Inconsistencies Noted/Cannot Verify]
+- **Overall Legibility Score:** [High/Medium/Low]   
+- **Illegible Entries:** [List fields marked [ILLEGIBLE]]   
+- **Handwritten Amendments:** [Describe corrections/overwrites if visible]  
+- **Mathematical Consistency:** [Verified/Inconsistencies Noted/Cannot Verify]   
 
 ### Summary & Confidence Level
-**Document Status:** [Complete/Partial/Requires Clarification]  
-**Data Extraction Confidence:** [High/Medium/Low]  
-**Audit Readiness:** [Yes/No]  
-**Notes for Compliance:** [Missing schedules, inconsistencies, required follow-up]
+**Document Status:** [Complete/Partial/Requires Clarification]   
+**Data Extraction Confidence:** [High/Medium/Low]   
+**Audit Readiness:** [Yes/No] 
+**Notes for Compliance:** [Missing schedules, inconsistencies, required follow-up] 
+
 """
 
 system_prompt="""
