@@ -9,7 +9,7 @@ from utils import *
 def generate_text(client, model_name: str, system_prompt: str, user_prompt: str,
                  image: Optional[Union[Image.Image, types.Part]] = None,
                  config: Optional[dict] = None,
-                 use_self_consistency: bool = True):
+                 use_self_consistency: bool = True)->str:
     """
     summary:
         Generate text from an LLM given a system prompt and user prompt, optionally including an image.
