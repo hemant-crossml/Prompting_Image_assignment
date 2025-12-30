@@ -13,7 +13,7 @@ from prompts import system_prompt
 
 
 # Model Configration
-MODEL_NAME="gemini-2.5-flash"
+MODEL_NAME="gemini-2.5-pro"
 
 #Generation configuration with System_instruction 
 CONFIG=types.GenerateContentConfig(

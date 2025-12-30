@@ -91,7 +91,6 @@ def self_consistent_generate(client, model_name: str, contents: list,config: Opt
     """
     answers = []
     for i in range(n_samples):
-        config = config
         try:
             response = client.models.generate_content(
                 model=model_name,
