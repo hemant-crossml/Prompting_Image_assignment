@@ -480,35 +480,12 @@ JSON SCHEMA (use "not readable" when unclear)
 
 #self consistency prompt
 """
-#You are a high-precision OCR + structured information extraction engine for scanned forms.
-
-Non-negotiable rules (always apply):
-- Extract ONLY what is explicitly visible in the provided image/document.
-- Never infer, guess, or “fill in” missing values.
-- If a field is missing/illegible/ambiguous, output null.
-- Preserve text and numbers exactly as written (including punctuation and decimals).
-- Follow the user-provided JSON schema exactly (no extra keys).
-- Output must be a single valid JSON object only (no prose, no markdown).
-
-Iterative self-consistency protocol (correctness-first):
-- Internally generate N independent candidate extractions from scratch (do not reuse earlier candidates as truth).
-- Aggregate candidates into one final answer by selecting the most consistent value per field (e.g., majority vote).
-- If no clear agreement, set the field to null and reduce confidence.
-(Self-consistency = sample diverse reasoning paths and select the most consistent answer.) 
-
-Optional refine protocol (quality gate, not truth source):
-- After forming the aggregated result, optionally run one “critique” pass that checks ONLY:
-  (1) schema validity,
-  (2) internal arithmetic/format consistency if applicable,
-  (3) every field has evidence grounded in the image.
-- Apply corrections only when they are directly supported by visible evidence; otherwise keep null.
-
-Evidence & confidence:
-- For each extracted field include:
-  - value
-  - evidence: a short snippet referencing the nearest printed label/line
-  - confidence: high|medium|low
-  - notes: brief ambiguity explanation when confidence is not high
+You are a meticulous tax form analyst. Think step-by-step:
+1. Identify all income sections and sum them
+2. Calculate deductions line-by-line 
+3. Apply tax rates precisely
+4. **END EVERY RESPONSE with exactly: "FINAL TAX LIABILITY: $X.XX"**
+Show your math. Be precise with decimals.
 """
 
 #tree of thought
@@ -628,128 +605,12 @@ Treat this section as the “calculation trail” shown on the form. Transcribe 
 """
 
 system_prompt="""
-
-## Task Objective
-Analyze the provided document image (a historical U.S. tax return form) and produce a compliance-ready structured extraction. Use *self-consistency prompting*: generate multiple independent candidate extractions, compare them for agreement, and output only the most consistent, evidence-supported final result.
-
-## Mandatory Policy (MUST FOLLOW)
-- Perform multiple independent extraction attempts internally.
-- Compare candidate outputs and select the most consistent final answer.
-- Do NOT reveal the number of attempts, internal candidates, disagreements, voting, or reasoning.
-- Output ONLY the final formatted result below.
-- Never hallucinate: if a field is missing or unclear, write **"Not Available"** or **"Illegible"**.
-- Preserve original spelling/casing for names/labels exactly as visible.
-- Normalize dates to ISO format (YYYY-MM-DD) **only if the date is clearly readable**; otherwise "Illegible".
-- Extract amounts exactly as written (including decimals/commas). Do not “fix” values unless the correction is explicitly written on the form.
-- Maintain formal, audit-safe language.
-
-## Procedure (INTERNAL — DO NOT OUTPUT)
-1. Produce N independent extractions (N ≥ 3), each time re-reading the image from scratch.
-2. For each field:
-   - Prefer the value that appears consistently across the majority of candidates.
-   - If no majority agreement exists, choose the value with the strongest visual evidence.
-   - If still uncertain, output "Illegible" / "Not Available".
-3. Run consistency checks:
-   - Totals vs. component sums where clearly applicable.
-   - Cross-check that tax year matches form header.
-   - Flag but do not “repair” contradictions; record them under Data Quality Notes.
-
-## Output Rules
-- Output must match the exact section headings and bullet/table structure below.
-- Do not add extra sections outside the template.
-- Do not include reasoning, confidence voting, or internal notes.
-- If a numeric value is present but ambiguous (overwritten/corrected), report it as written and mark as "Ambiguous".
-
----
-
-## FINAL OUTPUT FORMAT (TEXT ONLY)
-
-### Document Classification
-- Document Type:
-- Country/Jurisdiction:
-- Issuing Authority:
-- Form Name/Number:
-- Tax Year:
-- Page Indicator (if visible):
-
-### Taxpayer Details (as printed on form)
-- Full Name:
-- Address Line (Street/Rural route):
-- Post Office:
-- County:
-- State:
-- Filing Type (Individual/Joint/Not Available):
-
-### Stamps & Administrative Marks
-- Auditor's Stamp Present (Yes/No/Not Available):
-- Cashier's Stamp Present (Yes/No/Not Available):
-- File Code:
-- Serial No.:
-- District:
-
-### Income (Extract exactly)
-Provide values as seen on the form; if blank write "Not Available".
-
-| Line Item | Description (Form label) | Amount | Legibility |
-|---|---|---:|---|
-| 1 | Salaries and other compensation for personal services |  |  |
-| 2 | Dividends |  |  |
-| 3 | Interest (a) bank deposits/notes etc. (b) corporation bonds |  |  |
-| 4 | Interest on Government obligations |  |  |
-| 5 | Rents and royalties |  |  |
-| 6 | Annuities |  |  |
-| 7(a) | Net short-term gain from sale/exchange of capital assets |  |  |
-| 7(b) | Net long-term gain (or loss) from sale/exchange of capital assets |  |  |
-| 7(c) | Net gain (or loss) from sale/exchange of property other than capital assets |  |  |
-| 8 | Net profit (or loss) from business or profession |  |  |
-| 9 | Income (or loss) from partnerships/fiduciary income/other income |  |  |
-| 10 | Total income in items 1 to 9 |  |  |
-
-### Deductions (Extract exactly)
-| Line Item | Description (Form label) | Amount | Legibility |
-|---|---|---:|---|
-| 11 | Contributions paid |  |  |
-| 12 | Interest |  |  |
-| 13 | Taxes |  |  |
-| 14 | Losses from fire/storm/shipwreck/other casualty/theft |  |  |
-| 15 | Bad debts |  |  |
-| 16 | Other deductions authorized by law |  |  |
-| 17 | Total deductions in items 11 to 16 |  |  |
-| 18 | Net income (item 10 minus item 17) |  |  |
-
-### Computation of Tax (Extract exactly)
-| Line Item | Description (Form label) | Amount | Legibility |
-|---|---|---:|---|
-| 19 | Net income (item 18 above) |  |  |
-| 20 | Less: Personal exemption |  |  |
-| 21 | Credit for dependents |  |  |
-| 22 | Balance (surtax net income) |  |  |
-| 23 | Less: Item 4(a) above (if applicable) |  |  |
-| 24 | Earned income credit (if applicable) |  |  |
-| 25 | Balance subject to normal tax |  |  |
-| 26 | Normal tax (as stated on form) |  |  |
-| 27 | Surtax on item 22 |  |  |
-| 28 | Total (item 26 plus item 27) |  |  |
-| 29 | Total tax (if referenced) |  |  |
-| 30 | Less: Income tax paid at source |  |  |
-| 31 | Less: Foreign tax credit (if present) |  |  |
-| 32 | Balance of tax (item 29 minus items 30 and 31) |  |  |
-
-### Signatures & Dates
-- Taxpayer Signature Present (Yes/No/Illegible):
-- Spouse Signature Present (Yes/No/Not Available):
-- Signature Date (YYYY-MM-DD / Illegible / Not Available):
-- Preparer/Agent Mentioned (Yes/No/Not Available):
-
-### Data Quality Notes
-- Overall Legibility (High/Medium/Low):
-- Fields Marked Illegible (list):
-- Ambiguous/Corrected Values Noted (list):
-- Arithmetic Consistency Check (Verified / Not Verified / Not Applicable):
-- Compliance Follow-ups Needed (brief):
-
+You are a meticulous tax form analyst. Think step-by-step:
+1. Identify all income sections and sum them
+2. Calculate deductions line-by-line 
+3. Apply tax rates precisely
+4. **END EVERY RESPONSE with exactly: "FINAL TAX LIABILITY: $X.XX"**
+Show your math. Be precise with decimals.
 """
-
-
-
-user_prompt="can you analyse income Section and also provide summary of that section"
+user_prompt="""Extract and calculate TOTAL TAX LIABILITY from this tax form image.
+Follow the step-by-step process above"""

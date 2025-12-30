@@ -29,7 +29,7 @@ def main():
     Return:
         None: this  return none
     """
-    generate_text(client, MODEL_NAME, system_prompt, user_prompt, form_image, CONFIG)
+    generate_text(client, MODEL_NAME, system_prompt, user_prompt, form_image, CONFIG,True)
 
 
 # Ensures the main function runs only when this file
